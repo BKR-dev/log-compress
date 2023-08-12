@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"compress/gzip"
 	"errors"
 	"fmt"
-	"internal/itoa"
 	"io"
 	"io/fs"
 	"os"
+	"time"
+
+	pgzip "github.com/klauspost/pgzip"
 )
 
 const (
@@ -74,61 +75,64 @@ func openFile(name string) (byteCount int64, buffer *bytes.Buffer) {
 
 func main() {
 
-	fileSize, _ := openFile("small.log")
-	fmt.Printf(
-		"small log:\nTotal bytes: %d\nSize in kb: %dkb\nSize in mb: %dmb\n",
-		fileSize, fileSize/1000, fileSize/1_000_000)
+	// fileSize, _ := openFile("small.log")
+	// fmt.Printf(
+	// 	"small log:\nTotal bytes: %d\nSize in kb: %dkb\nSize in mb: %dmb\n",
+	// 	fileSize, fileSize/1000, fileSize/1_000_000)
 
-	fileSize, _ = openFile("big.log")
-	fmt.Printf(
-		"big log:\nTotal bytes: %d\nSize in kb: %dkb\nSize in mb: %dmb\n",
-		fileSize, fileSize/1000, fileSize/1_000_000)
+	// fileSize, _ = openFile("big.log")
+	// fmt.Printf(
+	// 	"big log:\nTotal bytes: %d\nSize in kb: %dkb\nSize in mb: %dmb\n",
+	// 	fileSize, fileSize/1000, fileSize/1_000_000)
 
-	displayReadBytes()
+	// displayReadBytes()
+	now := time.Now()
+	fmt.Printf("Starting at: %s\n", now)
+	filename := "test.log"
+	compFilename := "test.gz"
+	decompressFilename := "decompressed.test"
+	compressFile(filename, compFilename)
+	fmt.Println("Finished compression")
+	// 30 475 158
+	decompressFile(compFilename, decompressFilename)
+	duration := time.Since(now)
+	fmt.Printf("Finished in: %s\n", duration)
 }
 
-func displayReadBytes() {
+func compressFile(filename, compFilename string) {
 
-	file, _ := os.Open("big.log")
+	file, _ := os.Open(filename)
 	defer file.Close()
 
-	b := make([]byte, partSize)
-	fmt.Println("partSize: ", partSize)
+	compFile, err := os.Create(compFilename)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer compFile.Close()
 
-	for {
-		counter := 1
+	bR := bufio.NewReader(file)
+	data, err := io.ReadAll(bR)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-		n, err := file.Read(b)
-		if err == io.EOF {
-			break
-			// nothing more to read
-		}
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		if n <= partSize {
-			// call gzip writer
-			fmt.Println(n)
-			counter++
-		}
+	b := make([]byte, len(data))
 
+	_, err = bR.Read(b)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	gWriter := pgzip.NewWriter(compFile)
+	defer gWriter.Close()
+
+	_, err = gWriter.Write(b)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 }
 
-func compressFile(data []byte, part int, filename string) (string, error) {
+func decompressFile(compFilename, decompressFilename string) {
 
-	pS := itoa.Itoa(part)
-
-	filePart, err := os.Create(filename + pS)
-
-	if errors.Is(err, &fs.PathError{}) {
-		return "nil", err
-	}
-
-	gWriter := gzip.NewWriter(filePart)
-	defer gWriter.Close()
-
-	return "nil", nil
 }
