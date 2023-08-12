@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"errors"
 	"fmt"
+	"internal/itoa"
 	"io"
 	"io/fs"
 	"os"
@@ -115,6 +117,18 @@ func displayReadBytes() {
 
 }
 
-func compressFile(data []byte, part int) (string, error) {
+func compressFile(data []byte, part int, filename string) (string, error) {
 
+	pS := itoa.Itoa(part)
+
+	filePart, err := os.Create(filename + pS)
+
+	if errors.Is(err, &fs.PathError{}) {
+		return "nil", err
+	}
+
+	gWriter := gzip.NewWriter(filePart)
+	defer gWriter.Close()
+
+	return "nil", nil
 }
