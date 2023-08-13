@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"time"
 
 	pgzip "github.com/klauspost/pgzip"
@@ -12,6 +13,7 @@ import (
 
 func main() {
 
+	PrintMemUsage()
 	// displayReadBytes()
 	now := time.Now()
 	fmt.Printf("Starting at: %s\n", now)
@@ -24,6 +26,7 @@ func main() {
 	decompressFile(compFilename, decompressFilename)
 	duration := time.Since(now)
 	fmt.Printf("Finished in: %s\n", duration)
+	PrintMemUsage()
 }
 
 func compressFile(filename, compFilename string) {
@@ -52,12 +55,26 @@ func compressFile(filename, compFilename string) {
 
 	gWriter := pgzip.NewWriter(compFile)
 	defer gWriter.Close()
-
+	PrintMemUsage()
 	_, err = gWriter.Write(b)
 	if err != nil {
 		fmt.Println(err)
 	}
 
+}
+
+func PrintMemUsage() {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+	fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
+	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+}
+
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
 }
 
 // TODO: Reverse it
