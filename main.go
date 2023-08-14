@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -40,23 +39,15 @@ func compressFile(filename, compFilename string) {
 	}
 	defer compFile.Close()
 
-	bR := bufio.NewReader(file)
-	data, err := io.ReadAll(bR)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	b := make([]byte, len(data))
-
-	_, err = bR.Read(b)
+	data, err := io.ReadAll(file)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	gWriter := pgzip.NewWriter(compFile)
 	defer gWriter.Close()
-	PrintMemUsage()
-	_, err = gWriter.Write(b)
+
+	_, err = gWriter.Write(data)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -67,14 +58,14 @@ func PrintMemUsage() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
-	fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
-	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	fmt.Printf("Alloc = %v GiB", bToGb(m.Alloc))
+	fmt.Printf("\tTotalAlloc = %v GiB", bToGb(m.TotalAlloc))
+	fmt.Printf("\tSys = %v GiB", bToGb(m.Sys))
 	fmt.Printf("\tNumGC = %v\n", m.NumGC)
 }
 
-func bToMb(b uint64) uint64 {
-	return b / 1024 / 1024
+func bToGb(b uint64) uint64 {
+	return b / 1024 / 1024 / 1024
 }
 
 // TODO: Reverse it
