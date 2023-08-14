@@ -30,8 +30,24 @@ func main() {
 
 func compressFile(filename, compFilename string) {
 
+	// 1024 * 1024 * 1024 (1024^3)
+	// = Gigglybitse
+	partSize := 1_073_741_824
+
+	buf := make([]byte, partSize)
+
 	file, _ := os.Open(filename)
 	defer file.Close()
+
+	fI, _ := os.Stat(filename)
+
+	fileSize := int(fI.Size())
+	d1Size, _ := io.ReadFull(file, buf)
+	fileSize -= d1Size
+
+	fmt.Printf("fileSize: %d\npartSize: %d\nbufSize: %d\n", fileSize, d1Size, len(buf))
+
+	os.Exit(1)
 
 	compFile, err := os.Create(compFilename)
 	if err != nil {
@@ -66,6 +82,10 @@ func PrintMemUsage() {
 
 func bToGb(b uint64) uint64 {
 	return b / 1024 / 1024 / 1024
+}
+
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
 }
 
 // TODO: Reverse it
