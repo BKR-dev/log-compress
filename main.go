@@ -19,8 +19,12 @@ func main() {
 	filename := "test.log"
 	compFilename := "test.gz"
 
-	partCount, _, _ := partInfo(filename, partSize)
+	partCount, lastPartSize, err := partInfo(filename, partSize)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println("Partcount: ", partCount)
+	fmt.Println("Size of last Part: ", lastPartSize)
 	duration := time.Since(now)
 	fmt.Printf("Finished in: %s\n", duration)
 	os.Exit(1)
@@ -48,6 +52,8 @@ func fileInformation(filename string) (int, error) {
 	return int(fileInfo.Size()), nil
 }
 
+// Returns the total count of Parts and the Size of the remainding Part
+// CAUTION! Assumes there is a reminding part (+1 to partCount!)
 func partInfo(filename string, partSize int) (int, int, error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -61,11 +67,9 @@ func partInfo(filename string, partSize int) (int, int, error) {
 	}
 	fileSize := int(fileInfo.Size())
 
-	partCount := fileSize / partSize
+	// adding the last part as it is possibly > partSize
+	partCount := (fileSize / partSize) + 1
 	lastPartSize := fileSize % partSize
-	fmt.Printf("Dividing fileSize %d by partSize %d: %d\n", fileSize, partSize, partCount)
-	fmt.Println("Last Part is of Size ", lastPartSize)
-
 	return partCount, lastPartSize, nil
 }
 
