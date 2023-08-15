@@ -31,39 +31,63 @@ func main() {
 func compressFile(filename, compFilename string) {
 
 	// 1024 * 1024 * 1024 (1024^3)
-	// = Gigglybitse
+	// = 1 Gigglybitse
 	partSize := 1_073_741_824
 
-	buf := make([]byte, partSize)
+	// buffer size of 1G
+	buf1G := make([]byte, partSize)
 
+	// open log file
 	file, _ := os.Open(filename)
 	defer file.Close()
-
-	fI, _ := os.Stat(filename)
-
-	fileSize := int(fI.Size())
-	d1Size, _ := io.ReadFull(file, buf)
-	fileSize -= d1Size
-
-	fmt.Printf("fileSize: %d\npartSize: %d\nbufSize: %d\n", fileSize, d1Size, len(buf))
-
-	os.Exit(1)
-
+	// create compressed file
 	compFile, err := os.Create(compFilename)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer compFile.Close()
 
-	data, err := io.ReadAll(file)
-	if err != nil {
-		fmt.Println(err)
-	}
+	// get filesize
+	fI, _ := os.Stat(filename)
+	fileSize := int(fI.Size())
+	// read "first" 1G into buffer
+	d1Size, _ := io.ReadFull(file, buf1G)
+	// subtract copied bytes from filesize
+	fileSize -= d1Size
+	// making it easy for me to keep track
+	fmt.Printf("fileSize: %d\npartSize: %d\nbufSize: %d\n", fileSize, d1Size, len(buf1G))
+
+	PrintMemUsage()
 
 	gWriter := pgzip.NewWriter(compFile)
 	defer gWriter.Close()
 
-	_, err = gWriter.Write(data)
+	_, err = gWriter.Write(buf1G)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	_, _ = file.Seek(int64(partSize), 0)
+
+	d1Size, _ = io.ReadFull(file, buf1G)
+	// subtract copied bytes from filesize
+	fileSize -= d1Size
+	// making it easy for me to keep track
+	fmt.Printf("fileSize: %d\npartSize: %d\nbufSize: %d\n", fileSize, d1Size, len(buf1G))
+
+	PrintMemUsage()
+
+	compFilename = "test2.gz"
+
+	compFile, err = os.Create(compFilename)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer compFile.Close()
+	gWriter = pgzip.NewWriter(compFile)
+	defer gWriter.Close()
+
+	_, err = gWriter.Write(buf1G)
 	if err != nil {
 		fmt.Println(err)
 	}
