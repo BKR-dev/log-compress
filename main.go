@@ -40,10 +40,10 @@ func main() {
 func fileInformation(filename string) (int, error) {
 	// open log file
 	file, err := os.Open(filename)
-	defer file.Close()
 	if err != nil {
 		return 0, err
 	}
+	defer file.Close()
 	// get filesize
 	fileInfo, err := os.Stat(filename)
 	if err != nil {
@@ -68,8 +68,11 @@ func partInfo(filename string, partSize int) (int, int, error) {
 	fileSize := int(fileInfo.Size())
 
 	// adding the last part as it is possibly > partSize
-	partCount := (fileSize / partSize) + 1
+	partCount := (fileSize / partSize)
 	lastPartSize := fileSize % partSize
+	if lastPartSize > 0 {
+		partCount++
+	}
 	return partCount, lastPartSize, nil
 }
 
