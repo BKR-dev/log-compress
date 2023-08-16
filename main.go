@@ -2,9 +2,14 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"runtime"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/klauspost/pgzip"
 )
 
 func main() {
@@ -16,44 +21,25 @@ func main() {
 	// displayReadBytes()
 	now := time.Now()
 	fmt.Printf("Starting at: %s\n", now)
+	// file names
 	filename := "test.log"
-	compFilename := "test.gz"
 
+	// get all needed information
 	partCount, lastPartSize, err := partInfo(filename, partSize)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Partcount: ", partCount)
-	fmt.Println("Size of last Part: ", lastPartSize)
+
+	// compress files
+	compressFile(filename, partCount, partSize, lastPartSize)
+	fmt.Println("Finished compression")
+
+	PrintMemUsage()
 	duration := time.Since(now)
 	fmt.Printf("Finished in: %s\n", duration)
-	os.Exit(1)
-
-	decompressFilename := "decompressed.test"
-	// compressFile(filename, compFilename)
-	fmt.Println("Finished compression")
-	// 30 475 158
-	decompressFile(compFilename, decompressFilename)
-	PrintMemUsage()
-}
-
-func fileInformation(filename string) (int, error) {
-	// open log file
-	file, err := os.Open(filename)
-	if err != nil {
-		return 0, err
-	}
-	defer file.Close()
-	// get filesize
-	fileInfo, err := os.Stat(filename)
-	if err != nil {
-		return 0, err
-	}
-	return int(fileInfo.Size()), nil
 }
 
 // Returns the total count of Parts and the Size of the remainding Part
-// CAUTION! Assumes there is a reminding part (+1 to partCount!)
 func partInfo(filename string, partSize int) (int, int, error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -76,46 +62,58 @@ func partInfo(filename string, partSize int) (int, int, error) {
 	return partCount, lastPartSize, nil
 }
 
-// func compressFile(filename, compFilename string) {
+func compressFile(filename string, partCount, partSize, lastPartSize int) {
 
-// 	// buffer size of 1G
-// 	buf1G := make([]byte, partSize)
+	// buffer size of 1G
+	buf1G := make([]byte, partSize)
 
-// 	// create compressed file
-// 	compFile, err := os.Create(compFilename)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-// 	defer compFile.Close()
+	file, err := os.Create(filename)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
 
-// 	// read "first" 1G into buffer
-// 	d1Size, _ := io.ReadFull(file, buf1G)
-// 	// subtract copied bytes from filesize
-// 	fileSize -= d1Size
-// 	// making it easy for me to keep track
-// 	// fmt.Printf("fileSize: %d\npartSize: %d\nbufSize: %d\n", fileSize, d1Size, len(buf1G))
+	PrintMemUsage()
 
-// 	PrintMemUsage()
+	for i := 0; i < partCount; i++ {
 
-// 	gWriter := pgzip.NewWriter(compFile)
-// 	defer gWriter.Close()
+		// create compressed file
+		compfileName := compFileNameParts(filename, i+1)
+		compFile, err := os.Create(compfileName)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer compFile.Close()
 
-// 	_, err = gWriter.Write(buf1G)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
+		gWriter := pgzip.NewWriter(compFile)
+		defer gWriter.Close()
 
-// 	// _, _ = file.Seek(int64(partSize), 0)
+		offset, err := file.Seek(int64(partSize)*int64((i+1)), 0)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Printf("Set offset relative to file size: %d\n", offset)
 
-// 	// d1Size, _ = io.ReadFull(file, buf1G)
-// 	// subtract copied bytes from filesize
-// 	// fileSize -= d1Size
-// 	// making it easy for me to keep track
-// 	// fmt.Printf("fileSize: %d\npartSize: %d\nbufSize: %d\n", fileSize, d1Size, len(buf1G))
+		_, err = io.ReadFull(file, buf1G)
+		if err != nil {
+			fmt.Println(err)
+		}
 
-// 	PrintMemUsage()
+		bytesWritten, err := gWriter.Write(buf1G)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Printf("bytes compressed: %v\n", bytesWritten)
+	}
 
-// }
+	PrintMemUsage()
+
+}
+
+func compFileNameParts(filename string, part int) string {
+	file, _, _ := strings.Cut(filename, ".")
+	return file + "." + strconv.Itoa(part) + ".gz"
+}
 
 func PrintMemUsage() {
 	var m runtime.MemStats
