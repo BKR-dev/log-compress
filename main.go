@@ -67,7 +67,7 @@ func compressFile(filename string, partCount, partSize, lastPartSize int) {
 	// buffer size of 1G
 	buf1G := make([]byte, partSize)
 
-	file, err := os.Create(filename)
+	file, err := os.Open(filename)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -86,7 +86,6 @@ func compressFile(filename string, partCount, partSize, lastPartSize int) {
 		defer compFile.Close()
 
 		gWriter := pgzip.NewWriter(compFile)
-		defer gWriter.Close()
 
 		offset, err := file.Seek(int64(partSize)*int64((i+1)), 0)
 		if err != nil {
@@ -104,6 +103,8 @@ func compressFile(filename string, partCount, partSize, lastPartSize int) {
 			fmt.Println(err)
 		}
 		fmt.Printf("bytes compressed: %v\n", bytesWritten)
+
+		defer gWriter.Close()
 	}
 
 	PrintMemUsage()
