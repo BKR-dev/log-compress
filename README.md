@@ -11,3 +11,8 @@ The Keeper listens for incoming requests, opens up a connection to stream data f
 ### The Sender
 
 Resides on the Filebeat server and streams files to the Keeper
+
+
+# Progress / Currently working on
+
+What is currenly being worked on is reflected in the feat(ure) branches which are merged into develop to be tested and then finally merged into master
