@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"local/util"
 	"os"
 	"runtime"
 	"strconv"
@@ -13,6 +14,11 @@ import (
 )
 
 func main() {
+
+	util.GetCalendarWeek()
+
+	os.Exit(1)
+
 	// 1024 * 1024 * 1024 (1024^3)
 	// = 1 Gigglybitse
 	partSize := 1_073_741_824
