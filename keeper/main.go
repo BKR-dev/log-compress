@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"local/server"
 	"local/util"
 	"os"
 	"runtime"
@@ -15,8 +16,9 @@ import (
 
 func main() {
 
-	util.GetCalendarWeek()
+	server.ServerStart()
 
+	util.GetCalendarWeek()
 	os.Exit(1)
 
 	// 1024 * 1024 * 1024 (1024^3)

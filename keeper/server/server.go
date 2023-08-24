@@ -21,13 +21,21 @@ func ServerStart() {
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }
 
+// Create new muxServer from gorilla
 func server() *mux.Router {
 	r := mux.NewRouter()
+	// use CORS middleware
 	r.Use(mux.CORSMethodMiddleware(r))
+	// define functions per route
 	r.HandleFunc("/", homeHandler).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/logs", logsHandler).Methods(http.MethodGet, http.MethodPut, http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/times", timesHandler).Methods(http.MethodGet, http.MethodPut, http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/upload", uploadHandler).Methods(http.MethodPost)
 	return r
+}
+
+func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	// akshually handle incoming file and write to db
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,8 +67,9 @@ const homeHTML = `<!DOCTYPE html>
         <title>THE KEEPER</title>
     </head>
     <body>
+				<h1>THE KEEPER</h1>
         {{.Message}}
+				<br />
 				{{.Time}}
     </body>
-</html>
-`
+</html>`
