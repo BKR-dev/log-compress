@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"local/db"
 	"local/server"
 	"local/util"
 	"os"
@@ -15,7 +16,11 @@ import (
 )
 
 func main() {
-
+	dB, err := db.GetDB("test.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	db.PrintSQLVersion(dB)
 	server.ServerStart()
 
 	util.GetCalendarWeek()
