@@ -30,12 +30,23 @@ func server() *mux.Router {
 	r.HandleFunc("/", homeHandler).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/logs", logsHandler).Methods(http.MethodGet, http.MethodPut, http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/times", timesHandler).Methods(http.MethodGet, http.MethodPut, http.MethodPost, http.MethodOptions)
-	r.HandleFunc("/upload", uploadHandler).Methods(http.MethodPost)
+	s := r.PathPrefix("/archive/").Subrouter()
+	s.HandleFunc("/", archivesHandler)
+	s.HandleFunc("/{key}/", archiveHandler).Methods(http.MethodPost, http.MethodGet)
+
 	return r
 }
 
-func uploadHandler(w http.ResponseWriter, r *http.Request) {
+// /archive
+func archivesHandler(w http.ResponseWriter, r *http.Request) {
+	// returns overview of written archives
+
+}
+
+// /archive/{key}
+func archiveHandler(w http.ResponseWriter, r *http.Request) {
 	// akshually handle incoming file and write to db
+
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -62,6 +73,19 @@ func timesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 const homeHTML = `<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>THE KEEPER</title>
+    </head>
+    <body>
+				<h1>THE KEEPER</h1>
+        {{.Message}}
+				<br />
+				{{.Time}}
+    </body>
+</html>`
+
+const statusHTML = `<!DOCTYPE html>
 <html lang="en">
     <head>
         <title>THE KEEPER</title>
