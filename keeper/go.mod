@@ -20,4 +20,5 @@ require (
 	github.com/glebarez/go-sqlite v1.21.2
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17
 )

@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"log"
 
+	// sql "github.com/mattn/go-sqlite3"
+	// sql "modernc.org/sqlite"
 	_ "github.com/glebarez/go-sqlite"
 )
 
-func connectToDatabase(dbFilename string) (*sql.DB, error) {
+func connectToDatabase() (*sql.DB, error) {
 	// connect
+
 	db, err := sql.Open("sqlite", ":memory:")
 	if err != nil {
 		log.Fatal(err)
@@ -27,10 +30,14 @@ func PrintSQLVersion(db *sql.DB) {
 }
 
 func GetDB(dbFilename string) (*sql.DB, error) {
-	db, err := connectToDatabase(dbFilename)
+	db, err := connectToDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return db, nil
+}
+
+func rotateDbFiles(db *sql.DB) {
+	// but how can i dumb the db file!?
 }
