@@ -46,11 +46,10 @@ func createTables(db *sql.DB) {
 	time DATETIME NOT NULL,
 	calendarWeek INTEGER NOT NULL
 	);`
-	out, err := db.Exec(createTable)
+	_, err := db.Exec(createTable)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(out)
 }
 
 func PrintSQLVersion(db *sql.DB) {
@@ -75,9 +74,8 @@ func GetDB() (*sql.DB, error) {
 func rotateDbFiles() {
 	// but how can i dumb the db file!?
 	cmd := exec.Command("sqlite3", "test.db", fmt.Sprintf(".backup '%s'", "backup.db"))
-	out, err := cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("backup cmd failed ", err)
 	}
-	fmt.Println(out)
 }
