@@ -23,5 +23,9 @@
 *.log
 *.gz
 
+# Ignore db files
+*.db
+
+
 .DS_Store
 .idea
