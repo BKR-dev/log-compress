@@ -16,15 +16,15 @@ import (
 )
 
 func main() {
-	dB, err := db.GetDB("test.db")
+	dB, err := db.GetDB()
 	if err != nil {
 		fmt.Println(err)
 	}
 	db.PrintSQLVersion(dB)
+	os.Exit(1)
 	server.ServerStart()
 
 	util.GetCalendarWeek()
-	os.Exit(1)
 
 	// 1024 * 1024 * 1024 (1024^3)
 	// = 1 Gigglybitse
