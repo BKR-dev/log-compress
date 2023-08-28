@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"os/exec"
 
 	_ "modernc.org/sqlite"
 )
@@ -30,13 +31,26 @@ func createDbFile() string {
 
 func connectToDatabase(dbFile string) (*sql.DB, error) {
 	// connect
-
 	db, err := sql.Open("sqlite", dbFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return db, nil
+}
+
+func createTables(db *sql.DB) {
+	const createTable string = `
+	CREATE TABLE IF NOT EXISTS logs(
+	id INTEGER NOT NULL PRIMARY KEY,
+	time DATETIME NOT NULL,
+	calendarWeek INTEGER NOT NULL
+	);`
+	out, err := db.Exec(createTable)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(out)
 }
 
 func PrintSQLVersion(db *sql.DB) {
@@ -50,14 +64,20 @@ func PrintSQLVersion(db *sql.DB) {
 func GetDB() (*sql.DB, error) {
 	dbFile := createDbFile()
 	db, err := connectToDatabase(dbFile)
+	createTables(db)
+	rotateDbFiles()
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	return db, nil
 }
 
-func rotateDbFiles(db *sql.DB) {
+func rotateDbFiles() {
 	// but how can i dumb the db file!?
-
+	cmd := exec.Command("sqlite3", "test.db", fmt.Sprintf(".backup '%s'", "backup.db"))
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("backup cmd failed ", err)
+	}
+	fmt.Println(out)
 }
