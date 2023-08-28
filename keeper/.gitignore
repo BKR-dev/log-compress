@@ -23,8 +23,15 @@
 *.log
 *.gz
 
+<<<<<<< HEAD
 # ignore db files
 *.db
 
+=======
+# Ignore db files
+*.db
+
+
+>>>>>>> develop
 .DS_Store
 .idea
