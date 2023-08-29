@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -8,9 +9,9 @@ import (
 )
 
 func main() {
-	dankStuffFoundOnline()
+	// dankStuffFoundOnline()
 	// readFromStdOut()
-
+	anotherDangThing()
 }
 
 func readFromStdOut() []byte {
@@ -42,4 +43,33 @@ func dankStuffFoundOnline() {
 	out := <-outC
 	fmt.Println(out)
 
+}
+
+func anotherDangThing() {
+	stdOutReader := os.Stdout
+	scanner := bufio.NewScanner(stdOutReader)
+	done := make(chan bool)
+	go func() {
+		for scanner.Scan() {
+			fmt.Println(scanner.Bytes())
+		}
+		done <- true
+	}()
+
+	fmt.Println("is done: ", <-done)
+}
+
+func somethingElse(f func()) string {
+	old := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	f()
+
+	w.Close()
+	os.Stdout = old
+
+	var buf bytes.Buffer
+	io.Copy(&buf, r)
+	return buf.String()
 }
