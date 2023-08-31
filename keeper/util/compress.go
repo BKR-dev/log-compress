@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"bufio"
@@ -70,7 +70,7 @@ func openFile(name string) (byteCount int64, buffer *bytes.Buffer) {
 	return
 }
 
-func main() {
+func doCompress() {
 
 	fileSize, _ := openFile("small.log")
 	fmt.Printf(
@@ -112,9 +112,5 @@ func displayReadBytes() {
 		}
 
 	}
-
-}
-
-func compressFile(data []byte, part int) (string, error) {
 
 }
