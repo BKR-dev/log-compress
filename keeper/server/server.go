@@ -72,6 +72,8 @@ func timesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("times directory: it werks!\n"))
 }
 
+// use htmx for a nicer view
+
 const homeHTML = `<!DOCTYPE html>
 <html lang="en">
     <head>

@@ -100,6 +100,7 @@ func compressFile(filename string, partCount, partSize, lastPartSize int) {
 
 		gWriter := pgzip.NewWriter(compFile)
 
+		// there could be a better way of doing this
 		offset, err := file.Seek(int64(partSize)*int64((i+1)), 0)
 		if err != nil {
 			fmt.Println(err)
