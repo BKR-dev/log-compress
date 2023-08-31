@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
+	"local/db"
+	"local/server"
 	"local/util"
 	"os"
 	"runtime"
@@ -14,10 +16,15 @@ import (
 )
 
 func main() {
+	dB, err := db.GetDB()
+	if err != nil {
+		fmt.Println(err)
+	}
+	db.PrintSQLVersion(dB)
+	os.Exit(1)
+	server.ServerStart()
 
 	util.GetCalendarWeek()
-
-	os.Exit(1)
 
 	// 1024 * 1024 * 1024 (1024^3)
 	// = 1 Gigglybitse
@@ -93,6 +100,7 @@ func compressFile(filename string, partCount, partSize, lastPartSize int) {
 
 		gWriter := pgzip.NewWriter(compFile)
 
+		// there could be a better way of doing this
 		offset, err := file.Seek(int64(partSize)*int64((i+1)), 0)
 		if err != nil {
 			fmt.Println(err)
