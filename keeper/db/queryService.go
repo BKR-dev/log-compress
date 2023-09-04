@@ -3,16 +3,18 @@ package db
 import "database/sql"
 
 type QueryService struct {
-	qS *sql.DB
+	db *sql.DB
 }
 
-func NewQueryService() {
-	qs := QueryService
-	return qs
+func NewQueryService(db *sql.DB) *QueryService {
+	return &QueryService{db: db}
 }
+
 
 func (*QueryService) getApplicationEntries() {
 }
 
 
 func (*QueryService) getOpenWrites() {}
+
+
