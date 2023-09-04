@@ -60,16 +60,16 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err := homeTempl.Execute(w, d)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		_, _ = w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
 	}
 }
 
 func logsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("logs directory: it werks!\n"))
+	_, _ = w.Write([]byte("logs directory: it werks!\n"))
 }
 func timesHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("times directory: it werks!\n"))
+	_, _ = w.Write([]byte("times directory: it werks!\n"))
 }
 
 // use htmx for a nicer view
