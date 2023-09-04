@@ -2,5 +2,5 @@ package db
 
 import ()
 
-func newQueryService(){
+func NewQueryService(){
 }
