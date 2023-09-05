@@ -1,24 +1,22 @@
 package model
 
-import ()
-
 // used for DTOs and DAOs definition
 
 type LogEntry struct {
-	Hostname string 
-	ApplicationName string
-	startTime string
-	endTime string
-	calendarWeek int16
-	fileSize int32
-	fileLastModified string
+	Hostname         string
+	ApplicationName  string
+	StartTime        string
+	EndTime          string
+	CalendarWeek     int16
+	FileSize         int32
+	FileLastModified string
 }
 
 type Archive struct {
-	Hostname string
+	Hostname        string
 	ApplicationName string
-	calendarWeek int16
-	fileSize int32
-	finishTime string
-	completed bool
+	CalendarWeek    int16
+	FileSize        int32
+	FinishTime      string
+	Completed       bool
 }

@@ -20,8 +20,9 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	db.PrintSQLVersion(dB)
-	// os.Exit(1)
+	os.Exit(1)
 	util.GetCalendarWeek()
 	server.ServerStart()
 
