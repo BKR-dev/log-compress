@@ -41,6 +41,7 @@ func connectToDatabase(dbFile string) (*sql.DB, error) {
 	return db, nil
 }
 
+/*
 type LogEntry struct {
 	Hostname         string
 	ApplicationName  string
@@ -59,8 +60,10 @@ type Archive struct {
 	FinishTime      string
 	Completed       bool
 }
+*/
 
 // creates tables for models
+
 func createTables(db *sql.DB) {
 	const createTableLogs string = `
 	CREATE TABLE IF NOT EXISTS log_entry(
@@ -101,32 +104,25 @@ func createTables(db *sql.DB) {
 
 func populateTables(db *sql.DB) {
 
-	// var populateLogs string
-	// var populateArchives strings.Builder
+	var populateArchives strings.Builder
 	var populateLogs strings.Builder
-	for i := 1; i < 11; i++ {
+	for i := 1; i < 1001; i++ {
 
 		fmt.Fprint(&populateLogs, "INSERT INTO log_entry ( id, hostname, application_name, start_time, end_time, calendar_week, file_size, file_last_modified) VALUES (")
 		fmt.Fprint(&populateLogs, "?, ?, ?, ?, ?, ?, ?, ?);")
-		// fmt.Fprint(&populateLogs, ")")
 
-		fmt.Println(populateLogs.String())
-
-		// fmt.Fprint(&populateArchives, "INSERT INTO archives ( id, hostname, application_name, calendar_week, file_size, finish_time, completed) VALUES (")
-		// fmt.Fprintf(&populateArchives, "%d, hostname_%d, app-%d, %d, %d, %s, %d", i, i+i, i, i, i, time.DateTime, 1)
-		// fmt.Fprint(&populateArchives, ");")
-
-		// fmt.Println(populateArchives.String())
+		fmt.Fprint(&populateArchives, "INSERT INTO archives ( id, hostname, application_name, calendar_week, file_size, finish_time, completed) VALUES (")
+		fmt.Fprint(&populateArchives, "?, ?, ?, ?, ?, ?, ?);")
 
 		_, err := db.Exec(populateLogs.String(), i, "hostname"+string(i), "app"+string(i), time.DateTime, time.DateTime, i, i, time.DateTime, 1)
 		if err != nil {
 			fmt.Println(err)
 		}
-		// _, err = db.Exec(populateArchives.String())
-		// if err != nil {
-		// 	fmt.Println(err)
-		// }
-		// populateArchives.Reset()
+		_, err = db.Exec(populateArchives.String(), i, i+i, i, i, i, time.DateTime, 1)
+		if err != nil {
+			fmt.Println(err)
+		}
+		populateArchives.Reset()
 		populateLogs.Reset()
 	}
 	fmt.Println("added 1000 entries for each table")
