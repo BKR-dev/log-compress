@@ -39,6 +39,7 @@ func connectToDatabase(dbFile string) (*sql.DB, error) {
 	return db, nil
 }
 
+// creates tables for models
 func createTables(db *sql.DB) {
 	const createTable string = `
 	CREATE TABLE IF NOT EXISTS logs(
@@ -50,6 +51,11 @@ func createTables(db *sql.DB) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+
+func populateTables(db *sql.DB){
+	
 }
 
 func PrintSQLVersion(db *sql.DB) {

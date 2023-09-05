@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"local/db"
 	"log"
 	"net/http"
 	"text/template"
@@ -14,6 +15,10 @@ var (
 	port      = "9443"
 	homeTempl = template.Must(template.New("").Parse(homeHTML))
 )
+
+type qS struct {
+	qS *db.QueryService
+}
 
 func ServerStart() {
 	fmt.Println("Starting Server: P: " + port)
@@ -33,20 +38,9 @@ func server() *mux.Router {
 	s := r.PathPrefix("/archive/").Subrouter()
 	s.HandleFunc("/", archivesHandler)
 	s.HandleFunc("/{key}/", archiveHandler).Methods(http.MethodPost, http.MethodGet)
+	r.HandleFunc("/status", statusHandler).Methods(http.MethodGet)
 
 	return r
-}
-
-// /archive
-func archivesHandler(w http.ResponseWriter, r *http.Request) {
-	// returns overview of written archives
-
-}
-
-// /archive/{key}
-func archiveHandler(w http.ResponseWriter, r *http.Request) {
-	// akshually handle incoming file and write to db
-
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -65,10 +59,26 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// /archive
+func archivesHandler(w http.ResponseWriter, r *http.Request) {
+	// returns overview of written archives
+
+}
+
+// /archive/{key}
+func archiveHandler(w http.ResponseWriter, r *http.Request) {
+	// akshually handle incoming file and write to db
+
+}
+
 func logsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("logs directory: it werks!\n"))
 }
 func timesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("times directory: it werks!\n"))
+}
+
+func statusHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("times directory: it werks!\n"))
 }
 

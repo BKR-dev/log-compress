@@ -21,10 +21,9 @@ func main() {
 		fmt.Println(err)
 	}
 	db.PrintSQLVersion(dB)
-	os.Exit(1)
-	server.ServerStart()
-
+	// os.Exit(1)
 	util.GetCalendarWeek()
+	server.ServerStart()
 
 	// 1024 * 1024 * 1024 (1024^3)
 	// = 1 Gigglybitse

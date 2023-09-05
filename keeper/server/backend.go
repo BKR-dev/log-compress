@@ -1,13 +1,9 @@
 package server
 
-import (
-	"local/db"
-)
+// type Handler struct {
+// 	qS *db.QueryService
+// }
 
-var (
-	qS = db.NewQueryService()
-)
-
-func returnData(target string) ([]string, error) {
-	return nil, nil
-}
+// func (*Handler) returnData(target string) ([]string, error) {
+// 	return nil, nil
+// }
