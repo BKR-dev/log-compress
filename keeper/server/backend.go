@@ -1,9 +1,6 @@
 package server
 
-// type Handler struct {
-// 	qS *db.QueryService
-// }
+// actual logic goes here after refactoring
 
-// func (*Handler) returnData(target string) ([]string, error) {
-// 	return nil, nil
-// }
+// using the util.compression and util.decompression
+// to archive logs
