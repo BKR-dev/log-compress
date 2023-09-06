@@ -15,10 +15,9 @@ var (
 	port        = "9443"
 	homeTempl   = template.Must(template.New("").Parse(homeHTML))
 	statusTempl = template.Must(template.New("").Parse(statusHTML))
-	dB,_ = db.GetDB()
+	dB, _       = db.GetDB()
 	qS          = db.NewQueryService(dB)
 )
-
 
 func ServerStart() {
 	fmt.Println("Starting Server: P: " + port)
@@ -79,9 +78,9 @@ func archiveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logsHandler(w http.ResponseWriter, r *http.Request) {
-
 	w.Write([]byte("logs directory: it werks!\n"))
 }
+
 func timesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("times directory: it werks!\n"))
 }
@@ -131,5 +130,6 @@ const statusHTML = `<!DOCTYPE html>
     <body>
 				<h1>THE KEEPER</h1>
         {{.Entries}}
+				<br/>
     </body>
 </html>`
