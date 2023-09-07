@@ -13,9 +13,6 @@ func NewQueryService(db *sql.DB) *QueryService {
 	return &QueryService{db: db}
 }
 
-//	func NewQueryService(db *sql.DB) *QueryService {
-//		return &QueryService{db: db}
-//	}
 func (q *QueryService) GetAllLogEntries() ([]string, error) {
 
 	rws, err := q.db.Query(`SELECT hostname, application_name FROM log_entry`)
@@ -43,6 +40,7 @@ func (q *QueryService) GetAllLogEntries() ([]string, error) {
 func (q *QueryService) GetApplicationEntries() {
 }
 
+// Writes on archives not finished compressing
 func (q *QueryService) GetPendingWrites() {
 }
 

@@ -33,18 +33,13 @@ func server() *mux.Router {
 	r.Use(mux.CORSMethodMiddleware(r))
 
 	// define functions per route
-	r.HandleFunc("/", homeHandler).
-		Methods(http.MethodGet, http.MethodOptions)
-	r.HandleFunc("/logs", logsHandler).
-		Methods(http.MethodGet, http.MethodPut, http.MethodPost, http.MethodOptions)
-	r.HandleFunc("/times", timesHandler).
-		Methods(http.MethodGet, http.MethodPut, http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/", homeHandler).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/logs", logsHandler).Methods(http.MethodGet, http.MethodPut, http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/times", timesHandler).Methods(http.MethodGet, http.MethodPut, http.MethodPost, http.MethodOptions)
 	subArch := r.PathPrefix("/archive/").Subrouter()
 	subArch.HandleFunc("/", archivesHandler)
-	subArch.HandleFunc("/{key}/", archiveHandler).
-		Methods(http.MethodPost, http.MethodGet)
-	r.HandleFunc("/status", statusHandler).
-		Methods(http.MethodGet)
+	subArch.HandleFunc("/{key}/", archiveHandler).Methods(http.MethodPost, http.MethodGet)
+	r.HandleFunc("/status", statusHandler).Methods(http.MethodGet)
 
 	return r
 }

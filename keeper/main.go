@@ -14,7 +14,6 @@ func main() {
 	}
 
 	db.PrintSQLVersion(dB)
-	// os.Exit(1)
 	util.GetCalendarWeek()
 	server.ServerStart()
 }

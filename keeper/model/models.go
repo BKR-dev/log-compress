@@ -1,8 +1,11 @@
 package model
 
+import "gorm.io/gorm"
+
 // used for DTOs and DAOs definition
 
 type LogEntry struct {
+	gorm.Model
 	Hostname         string
 	ApplicationName  string
 	StartTime        string
