@@ -5,12 +5,19 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"local/model"
+	"local/util"
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+
+	// "modernc.org/sqlite"
 	_ "modernc.org/sqlite"
 )
 
@@ -31,36 +38,16 @@ func createDbFile() string {
 	return dbFile
 }
 
-func connectToDatabase(dbFile string) (*sql.DB, error) {
-	// connect
-	db, err := sql.Open("sqlite", dbFile)
+func connectToDatabase(dbFile string) (*gorm.DB, error) {
+	// connect to db
+
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return db, nil
 }
-
-/*
-type LogEntry struct {
-	Hostname         string
-	ApplicationName  string
-	StartTime        string
-	EndTime          string
-	CalendarWeek     int16
-	FileSize         int32
-	FileLastModified string
-}
-
-type Archive struct {
-	Hostname        string
-	ApplicationName string
-	CalendarWeek    int16
-	FileSize        int32
-	FinishTime      string
-	Completed       bool
-}
-*/
 
 // creates tables for models
 
@@ -102,6 +89,10 @@ func createTables(db *sql.DB) {
 	fmt.Println(rslt.RowsAffected())
 }
 
+func createTablesWithGorm(db *gorm.DB, LogEntry *model.LogEntry, Archive *model.Archive) {
+	db.AutoMigrate(&LogEntry, &Archive)
+}
+
 func populateTables(db *sql.DB) {
 
 	var populateArchives strings.Builder
@@ -128,19 +119,49 @@ func populateTables(db *sql.DB) {
 	fmt.Println("added 1000 entries for each table")
 }
 
-func PrintSQLVersion(db *sql.DB) {
+func populateTablesWithGorm(db *gorm.DB, LogEntry *model.LogEntry, Archive *model.Archive) {
+	var logEntires []model.LogEntry
+	var archives []model.Archive
+
+	for i := 1; i < 1001; i++ {
+
+		entrie := model.LogEntry{
+			Hostname:         "Hostname_" + strconv.Itoa(i),
+			ApplicationName:  "AppName_" + strconv.Itoa(i),
+			StartTime:        time.DateTime,
+			EndTime:          time.DateTime,
+			CalendarWeek:     util.RndmCW(),
+			FileSize:         int32((i * 1_073_741_824) / 10),
+			FileLastModified: time.DateTime,
+		}
+		logEntires = append(logEntires, entrie)
+
+		archy := model.Archive{
+			Hostname:        "Hostname_" + strconv.Itoa(i),
+			ApplicationName: "AppName_" + strconv.Itoa(i),
+			CalendarWeek:    util.RndmCW(),
+			FileSize:        int32((i * 1_073_741_824) / 10),
+			FinishTime:      time.DateTime,
+			Completed:       util.RndmB(),
+		}
+		archives = append(archives, archy)
+	}
+	db.CreateInBatches(archives, 100)
+	db.CreateInBatches(logEntires, 100)
+}
+
+func PrintSQLVersion(db *gorm.DB) {
 	// get SQLite version
-	sqlVersion := db.QueryRow("select sqlite_version()")
 	var dbVersion string
-	_ = sqlVersion.Scan(&dbVersion)
+	db.Raw("select sqlite_version()").Scan(&dbVersion)
 	fmt.Println("SQLite Version: ", dbVersion)
 }
 
-func GetDB() (*sql.DB, error) {
+func GetDB() (*gorm.DB, error) {
 	dbFile := createDbFile()
 	db, err := connectToDatabase(dbFile)
-	createTables(db)
-	populateTables(db)
+	createTablesWithGorm(db, &model.LogEntry{}, &model.Archive{})
+	populateTablesWithGorm(db, &model.LogEntry{}, &model.Archive{})
 	rotateDbFiles()
 	if err != nil {
 		log.Fatal(err)

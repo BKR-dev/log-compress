@@ -86,11 +86,7 @@ func timesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
-	entries, err := qS.GetAllLogEntries()
-	if err != nil {
-		fmt.Println(err)
-		w.Write([]byte(err.Error()))
-	}
+	entries := trfmLstr(qS.GetAllLogEntriesWithGorm())
 
 	fmt.Println(entries)
 

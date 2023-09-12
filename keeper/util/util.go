@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"runtime"
 	"strconv"
@@ -147,4 +148,16 @@ func bToMb(b uint64) uint64 {
 // TODO: Reverse it
 func decompressFile(compFilename, decompressFilename string) {
 
+}
+
+func RndmCW() int16 {
+	rand.NewSource(time.Now().UnixNano())
+	min := 1
+	max := 52
+	return int16(rand.Intn(max-min+1) + min)
+}
+
+func RndmB() bool {
+	rand.NewSource(time.Now().UnixNano())
+	return rand.Intn(2) == 1
 }
