@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"local/db"
+	"local/model"
 	"log"
 	"net/http"
 	"text/template"
@@ -87,15 +88,13 @@ func timesHandler(w http.ResponseWriter, r *http.Request) {
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
 	entries := trfmLstr(qS.GetAllLogEntriesWithGorm())
-
-	fmt.Println(entries)
-
+	fmt.Println(entries[0])
 	var d = struct {
-		Entries []string
+		Entries []model.LogString
 	}{
 		entries,
 	}
-	err = statusTempl.Execute(w, d)
+	err := statusTempl.Execute(w, d)
 	if err != nil {
 		fmt.Println(err)
 		w.Write([]byte(err.Error()))
@@ -125,7 +124,12 @@ const statusHTML = `<!DOCTYPE html>
     </head>
     <body>
 				<h1>THE KEEPER</h1>
-        {{.Entries}}
+				<ul>
+        {{range .Entries}}
+					<li class="hostname">{{.Hostname}}</li>
+					<li class="appname">{{.ApplicationName}}</li>
+				{{end}}
 				<br/>
+				</ul>
     </body>
 </html>`
